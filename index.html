@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reminders</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-clipboard-list"></i>
+                Daily Reminders
+            </h1>
+            <p class="subtitle">Stay organized and never miss a task</p>
+        </header>
+
+        <main class="main-content">
+            <section class="add-reminder-section">
+                <div class="input-group">
+                    <input type="text" id="reminderInput" placeholder="What do you need to remember today?" class="reminder-input">
+                    <button id="addReminderBtn" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Reminder
+                    </button>
+                </div>
+            </section>
+
+            <section class="reminders-section">
+                <div class="section-header">
+                    <h2>Your Reminders</h2>
+                    <div class="reminder-count">
+                        <span id="totalCount">0</span> total, 
+                        <span id="completedCount">0</span> completed
+                    </div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+
+                <div id="remindersList" class="reminders-list">
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No reminders yet</h3>
+                        <p>Add your first reminder to get started!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
