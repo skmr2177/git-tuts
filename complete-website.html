@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Reminders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .title i {
+            margin-right: 15px;
+            color: #ffd700;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* Add Reminder Section */
+        .add-reminder-section {
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reminder-input {
+            flex: 1;
+            padding: 18px 24px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .reminder-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .add-btn {
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Reminders Section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .reminder-count {
+            font-size: 0.9rem;
+            color: #666;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e1e8ed;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Reminders List */
+        .reminders-list {
+            min-height: 200px;
+        }
+
+        .reminder-item {
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        .reminder-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .reminder-item.completed {
+            opacity: 0.7;
+            background: #e8f5e8;
+            border-color: #c3e6c3;
+        }
+
+        .reminder-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-checkbox.checked {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .reminder-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .reminder-text {
+            flex: 1;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .reminder-text.completed {
+            text-decoration: line-through;
+            color: #666;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #ffb300;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 25px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .add-btn {
+                justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .filter-tabs {
+                justify-content: center;
+            }
+            
+            .reminder-item {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-clipboard-list"></i>
+                Daily Reminders
+            </h1>
+            <p class="subtitle">Stay organized and never miss a task</p>
+        </header>
+
+        <main class="main-content">
+            <section class="add-reminder-section">
+                <div class="input-group">
+                    <input type="text" id="reminderInput" placeholder="What do you need to remember today?" class="reminder-input">
+                    <button id="addReminderBtn" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                        Add Reminder
+                    </button>
+                </div>
+            </section>
+
+            <section class="reminders-section">
+                <div class="section-header">
+                    <h2>Your Reminders</h2>
+                    <div class="reminder-count">
+                        <span id="totalCount">0</span> total, 
+                        <span id="completedCount">0</span> completed
+                    </div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="active">Active</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+
+                <div id="remindersList" class="reminders-list">
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No reminders yet</h3>
+                        <p>Add your first reminder to get started!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Reminder App Class
+        class ReminderApp {
+            constructor() {
+                this.reminders = this.loadFromStorage();
+                this.currentFilter = 'all';
+                this.editingId = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.render();
+            }
+
+            bindEvents() {
+                // Add reminder event
+                document.getElementById('addReminderBtn').addEventListener('click', () => this.addReminder());
+                document.getElementById('reminderInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addReminder();
+                });
+
+                // Filter events
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.setFilter(e.target.dataset.filter));
+                });
+            }
+
+            addReminder() {
+                const input = document.getElementById('reminderInput');
+                const text = input.value.trim();
+                
+                if (!text) {
+                    this.showNotification('Please enter a reminder!', 'error');
+                    return;
+                }
+
+                if (this.editingId) {
+                    // Update existing reminder
+                    this.updateReminder(this.editingId, text);
+                    this.editingId = null;
+                    document.getElementById('addReminderBtn').innerHTML = '<i class="fas fa-plus"></i> Add Reminder';
+                } else {
+                    // Add new reminder
+                    const reminder = {
+                        id: Date.now(),
+                        text: text,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    this.reminders.push(reminder);
+                    this.showNotification('Reminder added successfully!', 'success');
+                }
+
+                input.value = '';
+                this.saveToStorage();
+                this.render();
+            }
+
+            updateReminder(id, newText) {
+                const reminder = this.reminders.find(r => r.id === id);
+                if (reminder) {
+                    reminder.text = newText;
+                    this.showNotification('Reminder updated successfully!', 'success');
+                }
+            }
+
+            toggleComplete(id) {
+                const reminder = this.reminders.find(r => r.id === id);
+                if (reminder) {
+                    reminder.completed = !reminder.completed;
+                    this.saveToStorage();
+                    this.render();
+                    
+                    const message = reminder.completed ? 'Reminder completed!' : 'Reminder marked as active!';
+                    this.showNotification(message, 'success');
+                }
+            }
+
+            editReminder(id) {
+                const reminder = this.reminders.find(r => r.id === id);
+                if (reminder) {
+                    document.getElementById('reminderInput').value = reminder.text;
+                    document.getElementById('reminderInput').focus();
+                    this.editingId = id;
+                    document.getElementById('addReminderBtn').innerHTML = '<i class="fas fa-edit"></i> Update Reminder';
+                }
+            }
+
+            deleteReminder(id) {
+                if (confirm('Are you sure you want to delete this reminder?')) {
+                    this.reminders = this.reminders.filter(r => r.id !== id);
+                    this.saveToStorage();
+                    this.render();
+                    this.showNotification('Reminder deleted!', 'success');
+                }
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                
+                // Update active filter button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+                
+                this.render();
+            }
+
+            getFilteredReminders() {
+                switch (this.currentFilter) {
+                    case 'active':
+                        return this.reminders.filter(r => !r.completed);
+                    case 'completed':
+                        return this.reminders.filter(r => r.completed);
+                    default:
+                        return this.reminders;
+                }
+            }
+
+            render() {
+                const remindersList = document.getElementById('remindersList');
+                const filteredReminders = this.getFilteredReminders();
+                
+                // Update counts
+                this.updateCounts();
+                
+                if (filteredReminders.length === 0) {
+                    remindersList.innerHTML = this.getEmptyStateHTML();
+                    return;
+                }
+
+                remindersList.innerHTML = filteredReminders
+                    .map(reminder => this.getReminderHTML(reminder))
+                    .join('');
+                
+                // Bind event listeners for reminder actions
+                this.bindReminderEvents();
+            }
+
+            getReminderHTML(reminder) {
+                const completedClass = reminder.completed ? 'completed' : '';
+                const checkedClass = reminder.completed ? 'checked' : '';
+                
+                return `
+                    <div class="reminder-item ${completedClass}" data-id="${reminder.id}">
+                        <div class="reminder-checkbox ${checkedClass}" onclick="app.toggleComplete(${reminder.id})"></div>
+                        <div class="reminder-text ${completedClass}">${this.escapeHtml(reminder.text)}</div>
+                        <div class="reminder-actions">
+                            <button class="action-btn edit-btn" onclick="app.editReminder(${reminder.id})" title="Edit reminder">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="app.deleteReminder(${reminder.id})" title="Delete reminder">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getEmptyStateHTML() {
+                const messages = {
+                    all: {
+                        icon: 'fas fa-bell-slash',
+                        title: 'No reminders yet',
+                        message: 'Add your first reminder to get started!'
+                    },
+                    active: {
+                        icon: 'fas fa-check-circle',
+                        title: 'No active reminders',
+                        message: 'All your reminders are completed!'
+                    },
+                    completed: {
+                        icon: 'fas fa-list-check',
+                        title: 'No completed reminders',
+                        message: 'Complete some reminders to see them here!'
+                    }
+                };
+
+                const state = messages[this.currentFilter];
+                
+                return `
+                    <div class="empty-state">
+                        <i class="${state.icon}"></i>
+                        <h3>${state.title}</h3>
+                        <p>${state.message}</p>
+                    </div>
+                `;
+            }
+
+            bindReminderEvents() {
+                // Events are bound via onclick attributes for simplicity
+                // In a production app, you might want to use event delegation
+            }
+
+            updateCounts() {
+                const total = this.reminders.length;
+                const completed = this.reminders.filter(r => r.completed).length;
+                
+                document.getElementById('totalCount').textContent = total;
+                document.getElementById('completedCount').textContent = completed;
+            }
+
+            saveToStorage() {
+                localStorage.setItem('dailyReminders', JSON.stringify(this.reminders));
+            }
+
+            loadFromStorage() {
+                const stored = localStorage.getItem('dailyReminders');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                // Add styles
+                Object.assign(notification.style, {
+                    position: 'fixed',
+                    top: '20px',
+                    right: '20px',
+                    padding: '12px 20px',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontWeight: '500',
+                    zIndex: '1000',
+                    transform: 'translateX(100%)',
+                    transition: 'transform 0.3s ease',
+                    background: type === 'error' ? '#f44336' : 
+                               type === 'success' ? '#4caf50' : '#2196f3'
+                });
+
+                document.body.appendChild(notification);
+
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Utility method to clear all reminders (for testing)
+            clearAllReminders() {
+                if (confirm('Are you sure you want to delete all reminders?')) {
+                    this.reminders = [];
+                    this.saveToStorage();
+                    this.render();
+                    this.showNotification('All reminders cleared!', 'success');
+                }
+            }
+        }
+
+        // Initialize the app
+        const app = new ReminderApp();
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter to add reminder
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                app.addReminder();
+            }
+            
+            // Escape to cancel editing
+            if (e.key === 'Escape' && app.editingId) {
+                app.editingId = null;
+                document.getElementById('reminderInput').value = '';
+                document.getElementById('addReminderBtn').innerHTML = '<i class="fas fa-plus"></i> Add Reminder';
+            }
+        });
+
+        // Add some sample data for demonstration (only on first visit)
+        if (app.reminders.length === 0) {
+            const sampleReminders = [
+                { id: 1, text: 'Buy groceries for the week', completed: false, createdAt: new Date().toISOString() },
+                { id: 2, text: 'Call mom to check in', completed: true, createdAt: new Date().toISOString() },
+                { id: 3, text: 'Review and respond to emails', completed: false, createdAt: new Date().toISOString() }
+            ];
+            
+            app.reminders = sampleReminders;
+            app.saveToStorage();
+            app.render();
+        }
+    </script>
+</body>
+</html>
